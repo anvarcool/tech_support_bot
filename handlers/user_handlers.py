@@ -38,7 +38,9 @@ async def make_request(message: Message):
 @router.message(F.text and F.text.lower() == 'узнать статус заявки')
 async def know_status(message: Message):
     status = ven_db.get_status(table_name, message.from_user.id)
-    await message.answer(f'{status}', reply_markup=ReplyKeyboardRemove())
+    ans = '\n'.join([s[0] + ': ' + s[1] for s  in status])
+    await message.answer(ans, reply_markup=keyboard)
+    await message.answer('Хотите сделать что-то еще?')
 
 
 @router.message(lambda x: x.text and x.text.isdigit() and users[x.from_user.id][0] == 'waiting_inn')
@@ -82,7 +84,8 @@ async def get_comment(message:Message):
     users[message.from_user.id][1]['req_text'] = message.text
     users[message.from_user.id][1]['user_id'] = message.from_user.id
     ven_db.post_data(users[message.from_user.id], table_name)
-    await message.answer(f'Номер вашей заявки: {users[message.from_user.id][1]["request_number"]}', reply_markup=ReplyKeyboardRemove())
+    await message.answer(f'Номер вашей заявки: {users[message.from_user.id][1]["request_number"]}', reply_markup = keyboard)
+    await message.answer('Хотите сделать что-то еще?')
     del users[message.from_user.id]
 
 
