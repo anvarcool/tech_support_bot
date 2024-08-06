@@ -27,20 +27,13 @@ contact_btn_auto = KeyboardButton(
 )
 contact_btn_hand = KeyboardButton(text = 'Ввести вручную')
 contact_kboard = ReplyKeyboardMarkup(keyboard=[[contact_btn_auto, contact_btn_hand]], resize_keyboard=True)
-@router.message(Command(commands=["start"]))
-async def process_start_command(message: Message):
-    await message.answer('Здравствуйте! Что вы хотите сделать?',  reply_markup=keyboard)
 
-@router.message(Command(commands=['help']))
-async def process_help_command(message: Message):
-    await message.answer(
-        'Тут будет список команд наверное'
-    )
 
 @router.message(F.text and F.text.lower() == 'завести заявку')
 async def make_request(message: Message):
     users[message.from_user.id] = ['waiting_inn', {}]
     await message.answer('Введите ИНН юрлица', reply_markup=ReplyKeyboardRemove())
+
 
 @router.message(F.text and F.text.lower() == 'узнать статус заявки')
 async def know_status(message: Message):
@@ -57,9 +50,11 @@ async def get_inn(message: Message):
     else:
         await message.answer('Неверный формат ИНН, попробуйте еще раз')
 
+
 @router.message(lambda x: x.text and x.text.lower() == 'ввести вручную')
 async def hand_phone(message: Message):
     await message.answer('Напишите номер телефона', reply_markup=ReplyKeyboardRemove())
+
 
 @router.message(lambda x: users[x.from_user.id][0] == 'waiting_phone')
 async def get_phone(message: Message):
@@ -77,6 +72,7 @@ async def get_phone(message: Message):
         else:
             await message.answer('Неверный формат номера телефона, попробуйте еще раз')
 
+
 @router.message(lambda x: users[x.from_user.id][0] == 'comment')
 async def get_comment(message:Message):
     users[message.from_user.id][1]['firstname'] = message.from_user.first_name
@@ -89,6 +85,7 @@ async def get_comment(message:Message):
     await message.answer(f'Номер вашей заявки: {users[message.from_user.id][1]["request_number"]}', reply_markup=ReplyKeyboardRemove())
     del users[message.from_user.id]
 
+
 @router.message()
 async def process_other_answers(message: Message):
-    await message.answer('hi')
+    await message.answer('Чтобы начать, напишите /start')
